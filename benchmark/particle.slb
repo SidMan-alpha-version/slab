@@ -1,0 +1,22 @@
+record Particle:
+    x: f64
+    y: f64
+    vx: f64
+    vy: f64
+
+fn main():
+    workspace ws:
+        n = 100000
+        steps = 10
+        dt = 0.01
+
+        pts = array<Particle>[n]
+        for i in 0..n:
+            pts.push(i * 0.001, i * 0.002, 1.5, -2.5)
+
+        for s in 0..steps:
+            parallel for i in 0..n:
+                pts.x[i] = pts.x[i] + pts.vx[i] * dt
+                pts.y[i] = pts.y[i] + pts.vy[i] * dt
+
+        state pts.x[0], pts.y[0], pts.x[99999], pts.y[99999]
