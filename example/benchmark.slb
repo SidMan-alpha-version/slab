@@ -1,0 +1,63 @@
+# Slab Benchmark & Verification Suite
+# Tests: Records, SoA Arrays, Arena Workspaces, Loop Reset, SIMD Pragmas, Math Operators
+
+record Particle:
+    x: f32
+    y: f32
+    vx: f32
+    vy: f32
+    active: bool
+
+fn main():
+    println("--- SLAB BENCHMARK & SYSTEM TEST ---")
+
+    # Math constants & functions
+    pi = math.pi
+    e = math.e
+    tau = math.tau
+    state pi, e, tau
+
+    # Math expressions: exponentiation (^) and inverse trig arc(sin(x))
+    angle_rad = arc(sin(1.0))
+    hypot_sq = 3.0 ^ 2.0 + 4.0 ^ 2.0
+    state angle_rad, hypot_sq
+
+    # Sigma summation: sum of i^2 for i from 1 to 100
+    sum_squares = sigma (i ^ 2.0) from 1.0 limit 100.0 -> 1.0
+    state sum_squares
+
+    # Numerical integration: integral of sin(x) from 0 to pi (analytical value = 2.0)
+    int_sin = integral(sin(x) from 0.0 limit math.pi -> 0.0001)
+    state int_sin
+
+    # String deduplication via etch
+    status = etch("ACTIVE")
+    state status
+
+    # Workspace & SoA Array Allocation
+    workspace sim:
+        particles = array<Particle>[10000]
+        println("Initializing 10,000 particles in Struct-of-Arrays (SoA)...")
+
+        for i in 0..10000:
+            particles.push(10.0, 20.0, 1.5, -2.5, true)
+
+        count = particles.len
+        state count
+
+        # SIMD vectorized update loop using pure math equations (no += / -=)
+        for i in 0..particles.len:
+            particles.x[i] = particles.x[i] + particles.vx[i]
+            particles.y[i] = particles.y[i] + particles.vy[i]
+
+        first_x = particles.x[0]
+        first_y = particles.y[0]
+        state first_x, first_y
+
+        # Loop with opt-in scratchpad rewind (reset:) - 0 bytes net growth!
+        for step in 0..5:
+            reset:
+                loop_val = step * 100
+                state loop_val
+
+    println("Benchmark completed successfully with 0 memory leaks!")

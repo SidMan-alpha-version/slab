@@ -1,0 +1,51 @@
+# Slab Zero-Copy String Manipulation Verification Suite
+# Tests:
+# 1. len, contains, starts_with, ends_with
+# 2. trim, slice
+# 3. + concatenation
+# 4. split inside a for + reset: log-parsing loop
+# 5. dual call syntax (method & function)
+
+fn main():
+    println("=== SLAB STRING SUITE START ===")
+
+    # 1. Basic properties & predicates
+    text = etch("  [INFO] User logged in: admin  ")
+    l = len(text)
+    state l
+
+    has_info = text.contains("[INFO]")
+    has_err = text.contains("[ERROR]")
+    state has_info, has_err
+
+    # 2. Trim & Slice (zero-copy views)
+    trimmed = text.trim()
+    state trimmed
+
+    is_log = trimmed.starts_with("[INFO]")
+    is_csv = trimmed.ends_with(".csv")
+    state is_log, is_csv
+
+    # Slice header "[INFO]"
+    header = trimmed.slice(0, 6)
+    state header
+
+    # 3. String concatenation (+) in active workspace
+    workspace str_ws:
+        greeting = etch("Hello, ")
+        name = etch("Slab Systems!")
+        combined = greeting + name
+        state combined
+
+        # 4. Split inside for + reset: log-parsing loop
+        csv_data = etch("apple,banana,cherry,date,elderberry")
+        parts = csv_data.split(",")
+        parts_len = len(parts)
+        state parts_len
+
+        for fruit in parts:
+            reset:
+                msg = etch("Parsed fruit: ") + fruit
+                state msg
+
+    println("=== SLAB STRING SUITE COMPLETED SUCCESSFULLY ===")

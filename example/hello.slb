@@ -1,0 +1,4 @@
+fn main():
+    println("Hello, Slab v1.0!")
+    msg = "Welcome to RAM-efficient, mathematically expressive systems programming."
+    println(msg)

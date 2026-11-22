@@ -1,0 +1,105 @@
+# Slab Full Feature & Release Optimizations Verification Suite
+# Tests:
+# 1. math.pi, math.e, sin, arc(sin(x)) inverse trig
+# 2. arc(array) zero-copy reverse iteration & in-place reversal
+# 3. sigma summation & numerical integral
+# 4. array<T> SoA equations
+# 5. search ... or construct
+# 6. sort ... by ... desc low-RAM permutation sort
+# 7. do ... until loop
+# 8. reset: block loop rewind
+# 9. etch() string deduplication
+# 10. --pack dead-field stripping + 1-bit boolean packing
+
+record Point:
+    x: f64
+    y: f64
+    active: bool
+    unused_debug_tag: f64
+
+fn main():
+    println("=== SLAB FULL TEST START ===")
+
+    # 1. Math Constants & Inverse Trig
+    pi = math.pi
+    e = math.e
+    state pi, e
+
+    # Test arc(sin(x)) -> asin(sin(x)) == x
+    orig_val = 0.5
+    s = sin(orig_val)
+    recovered = arc(sin(orig_val))
+    state orig_val, s, recovered
+
+    # 2. Sigma & Integral
+    sum_10 = sigma (i * 2.0) from 1.0 limit 10.0 -> 1.0
+    state sum_10
+
+    # Integral of sin(x) from 0 to pi = 2.0
+    area = integral(sin(x) from 0.0 limit math.pi -> 0.0001)
+    state area
+
+    # 3. Etch (Deduplicated String Constant)
+    tag = etch("VERIFIED_ETCH")
+    state tag
+
+    # 4. Workspace & SoA Array with 1-Bit Bool Packing
+    workspace test_ws:
+        pts = array<Point>[10]
+        pts.push(1.0, 50.0, true, 999.0)
+        pts.push(2.0, 10.0, false, 999.0)
+        pts.push(3.0, 40.0, true, 999.0)
+        pts.push(4.0, 20.0, false, 999.0)
+        pts.push(5.0, 30.0, true, 999.0)
+
+        n = pts.len
+        state n
+
+        # Read packed bool column
+        b0 = pts.active[0]
+        b1 = pts.active[1]
+        state b0, b1
+
+        # Modify packed bool column
+        pts.active[1] = true
+        b1_mod = pts.active[1]
+        state b1_mod
+
+        # 5. Sort Statement (sort pts by y desc)
+        println("Sorting points by y descending...")
+        sort pts by y desc
+
+        y0 = pts.y[0]
+        y1 = pts.y[1]
+        y4 = pts.y[4]
+        state y0, y1, y4
+
+        # 6. Zero-Copy Reverse Iteration: for p in arc(pts)
+        println("Testing zero-copy reverse iteration via arc(pts):")
+        for p in arc(pts):
+            println("reverse loop iteration")
+
+        # 7. In-Place Reversal: arc(pts)
+        println("Reversing array in-place via arc(pts)...")
+        arc(pts)
+        rev_y0 = pts.y[0]
+        state rev_y0
+
+        # 8. Search ... or construct
+        search_idx = search pts : pts.y[i] == 50.0 or -1
+        state search_idx
+
+        # 9. Do ... until loop
+        counter = 0
+        do:
+            counter = counter + 1
+        until counter >= 3
+        state counter
+
+        # 10. Reset: block loop scratchpad rewind
+        for step in 0..3:
+            reset:
+                scratch = step * 10
+                state scratch
+
+    println("=== SLAB FULL TEST COMPLETED SUCCESSFULLY ===")

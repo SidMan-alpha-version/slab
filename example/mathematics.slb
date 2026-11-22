@@ -1,0 +1,26 @@
+fn main():
+    println("=== Slab Mathematics Demo ===")
+    
+    # 1. Fundamental Constants
+    println("Constants:")
+    state math.pi, math.e, math.tau
+
+    # 2. Trigonometry & Inverse Trig (arc)
+    val = 0.5
+    s = sin(val)
+    inv_s = arc(sin(val))
+    println("Trigonometry:")
+    state val, s, inv_s
+
+    # 3. Discrete Summation (sigma)
+    # Basel problem partial sum: sum(1/n^2) ~ pi^2 / 6
+    basel_sum = sigma (1.0 / (i * i)) from 1.0 limit 1000.0 -> 1.0
+    expected = (math.pi * math.pi) / 6.0
+    println("Sigma Summation:")
+    state basel_sum, expected
+
+    # 4. Numerical Integration (integral)
+    # Integral of sin(x) from 0 to pi = 2.0
+    area = integral(sin(x) from 0.0 limit math.pi -> 0.0001)
+    println("Numerical Integration:")
+    state area

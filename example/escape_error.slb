@@ -1,0 +1,8 @@
+# Test that memory escape violation is caught at compile time
+
+fn test_escape():
+    outer_ref = 0
+    workspace inner_ws:
+        inner_data = etch("ESCAPE_ATTEMPT")
+        # Assigning inner reference to outer variable is a memory escape violation
+        outer_ref = inner_data
