@@ -47,9 +47,9 @@ make test
 ```slab
 # examples/hello.slb
 fn main():
-    println("Hello, Slab v1.0!")
+    state("Hello, Slab v1.0!")
     msg = "Welcome to RAM-efficient systems programming."
-    println(msg)
+    state(msg)
 ```
 
 Run directly:
