@@ -49,7 +49,7 @@ make test
 fn main():
     state("Hello, Slab v1.0!")
     msg = "Welcome to RAM-efficient systems programming."
-    state(msg)
+    printfn(msg)
 ```
 
 Run directly:
